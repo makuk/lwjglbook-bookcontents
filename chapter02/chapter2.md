@@ -1,8 +1,8 @@
 # The Game Loop
 
-In this chapter we will start developing our game engine by creating our game loop. The game loop is the core component of every game. It is basically an endless loop which is responsible for periodically handling user input, updating game state and rendering to the screen.
+이번 장에서는 게임 루프를 만듦으로써 게임 엔진 개발을 본격적으로 시작해 보겠습니다. 게임 루프는 모든 게임에서의 핵심 요소입니다. 사용자 입력 처리, 게임 상태 업데이트, 화면 렌더링 같은 일을 끝없이 반복하죠.
 
-The following snippet shows the structure of a game loop:
+게임 루프의 구조를 아래 코드를 통해 살펴봅시다.
 
 ```java
 while (keepOnRunning) {
@@ -12,9 +12,9 @@ while (keepOnRunning) {
 }
 ```
 
-So, is that all? Are we finished with game loops? Well, not yet. The above snippet has many pitfalls. First of all the speed that the game loop runs at will be different depending on the machine it runs on. If the machine is fast enough the user will not even be able to see what is happening in the game. Moreover, that game loop will consume all the machine resources.
+이렇게 하면 게임 루프는 끝났다고 할 수 있을까요? 그렇지 않습니다. 위 코드에는 많은 문제점이 있습니다. 먼저, 이 코드는 돌아가는 기기에 따라 속도가 천차만별일 겁니다. 속도가 너무 빠르면 사용자가 게임에서 뭔 일이 일어나는지 알 수 없는 일이 발생하게 될 수도 있습니다. 게다가 이 코드는 기기 자원을 너무 낭비합니다.
 
-Thus, we need the game loop to try running at a constant rate independently of the machine it runs on. Let us suppose that we want our game to run at a constant rate of 50 Frames Per Second \(FPS\). Our game loop could be something like this:
+그러므로 돌아가는 기기와는 상관없도록 게임 루프가 돌아갈 일정한 주기를 정해 주어야 합니다. 주기를 초당 50 프레임\(Frames Per Second, FPS\)으로 정해 봅시다. 그러면 코드가 이렇게 됩니다.
 
 ```java
 double secsPerFrame = 1.0d / 50.0d;
@@ -28,17 +28,17 @@ while (keepOnRunning) {
 }
 ```
 
-This game loop is simple and could be used for some games but it also presents some problems. First of all, it assumes that our update and render methods fit in the available time we have in order to render at a constant rate of 50 FPS \(that is, `secsPerFrame` which is equal to 20 ms.\).
+이번 게임 루프는 간단하고 게임에 넣을 수 있을 정도지만 아직도 문제점이 남아 있습니다. 이 코드는 업데이트와 렌더링 메소드가 50 FPS\(`secsPerFrame`은 20ms\)에 정확히 맞게 돌아갈 거라고 가정해 버립니다.
 
-Besides that, our computer may be prioritizing other tasks that prevent our game loop from executing for a certain period of time. So, we may end up updating our game state at very variable time steps which are not suitable for game physics.
+게다가 게임 루프보다 우선 순위가 높은 일이 있어 게임 루프가 돌아가는 걸 방해한다면 게임 상태 업데이트가 불규칙적으로 이루어지게 될 겁니다. 게임 물리학에는 매우 좋지 못한 방법이죠.
 
-Finally, sleep accuracy may range to tenth of a second, so we are not even updating at a constant frame rate even if our update and render methods take no time. So, as you see the problem is not so simple.
+마지막으로, 슬립하는 시간이 1/10초정도 오차가 날 수 있습니다. 그러니까 업데이트와 렌더링 메소드가 작동되는 데 시간이 전혀 걸리자 않는다고 하더라도 일정한 프레임 속도를 유지할 수가 없게 되는 것이죠. 보시다시피 이런 문제들은 그리 간단한 게 아닙니다.
 
-On the Internet you can find tons of variants for game loops. In this book we will use a not too complex approach that can work well in many situations. So let us move on and explain the basis for our game loop. The pattern used here is usually called Fixed Step Game Loop.
+인터넷에는 매우 많고 다양한 게임 루프가 있습니다. 이 책에서는 다양한 상황에서 잘 작동되고 그리 복잡해지지 않는 쪽으로 접근해 볼 겁니다. 그럼 여기에서 사용할 게임 루프의 기본 원리를 설명하겠습니다. 이 방식의 이름은 Fixed Step Game Loop입니다.
 
-First of all we may want to control separately the period at which the game state is updated and the period at which the game is rendered to the screen. Why do we do this? Well, updating our game state at a constant rate is more important, especially if we use some physics engine. On the contrary, if our rendering is not done in time it makes no sense to render old frames while processing our game loop. We have the flexibility to skip some frames.
+먼저 게임 상태가 업데이트되는 때와 화면에 게임이 렌더링되는 때를 따로 관리할 수 있어야 합니다. 게임 상태를 일정한 시간마다 업데이트하는 건 중요하기 때문이죠. 특히 물리엔진을 사용한다면 더욱 중요합니다. 한편 렌더링이 제 시간에 끝나지 못하고 다음 루프에서 밀린 렌더링을 처리하는 것도 좋지 못합니다. 프레임을 스킵할 수 있게 하여 유연성을 늘리는 것이 좋겠죠.
 
-Let us have a look at how our game loop looks like:
+그럼 코드를 살펴 보도록 합시다.
 
 ```java
 double secsPerUpdate = 1.0d / 30.0d;
@@ -62,7 +62,7 @@ while (true) {
 }
 ```
 
-With this game loop we update our game state at fixed steps. But how do we control that we do not exhaust the computer's resources by rendering continuously? This is done in the sync method:
+이 게임 루프에서는 스텝을 고정시켜 게임을 업데이트합니다. 그런데 끝없이 렌더링함으로써 컴퓨터 자원을 다 써버리지 않게 하기 위해서는 어떻게 해야 할까요? sync 메소드를 만들어서 이를 해결해 봅시다.
 
 ```java
 private void sync(double loopStartTime) {
@@ -76,7 +76,7 @@ private void sync(double loopStartTime) {
 }
 ```
 
-So what are we doing in the above method? In summary we calculate how many seconds our game loop iteration should last \(which is stored in the `loopSlot` variable\) and we wait for that amount of time taking into consideration the time we spent in our loop. But instead of doing a single wait for the whole available time period we do small waits. This will allow other tasks to run and will avoid the sleep accuracy problems we mentioned before. Then, what we do is:  
+위 메소드는 어떤 일을 하는 걸까요? 요약하자면 게임 루프가 한 번 돌아가는 시간을 게산하고\(`loopSlot` 변수에 저장됨\) 그 시간까지 남은 만큼 기다려 줍니다. 하지만 그 남은 시간을 한번에 기다리는 대신 조금씩 기다립니다. 이렇게 하면 다른 작업들이 돌아갈 수 있게 되고, 앞서 말했던 정확도 문제도 해결할 수 있습니다. 그리고 그 다음에 해야 할 일들은 이렇습니다.
 1.    Calculate the time at which we should exit this wait method and start another iteration of our game loop \(which is the variable `endTime`\).  
 2.    Compare the current time with that end time and wait just one millisecond if we have not reached that time yet.
 
@@ -287,7 +287,7 @@ What does this mean? The answer is that some functions of the GLFW library canno
 
 This is a constraint of the GLFW library and basically it implies that we should avoid the creation of new Threads for the game loop. We could try to create all the Windows related stuff in the main thread but we will not be able to render anything. The problem is that, OpenGL calls need to be performed in the same `Thread` that its context was created.
 
-On Windows and Linux platforms, although we are not using the main thread to initialize the GLFW stuff the samples will work. The problem is with OSX, so we need to change the source code of the `run` method of the `GameEngine` class to support that platform like this:
+윈도우와 리눅스에서는 메인 스레드에서 GLFW를 초기화하지 않아도 예제 코드가 작동되겠지만, OSX에서는 아닙니다. 그래서 OSX에서도 작동이 되게 하기 위해서는 `GameEngine` 클래스에 있는 `run` 메소드의 코드를 약간 수정해야 합니다.
 
 ```java
 public void start() {
@@ -300,17 +300,17 @@ public void start() {
 }
 ```
 
-What we are doing is just ignoring the game loop thread when we are in OSX and execute the game loop code directly in the main Thread. This is not a perfect solution but it will allow you to run the samples on Mac. Other solutions found in the forums \(such as executing the JVM with the `-XstartOnFirstThread`  flag seem to not work\).
+위 코드는 OSX일 경우에 게임 루프 스레드를 만들지 않고 메인 스레드에서 게임 루프 코드를 실행시킵니다. 이건 완벽한 해결책은 아니지만 맥에서 예제 코드를 작동시킬 수는 있습니다. 포럼에 나오는 다른 해결책\(JVM을 `-XstartOnFirstThread` 플래그를 넣어서 실행시키는 것\)은 잘 먹히지 않는 것으로 보입니다.
 
 In the future it may be interesting to explore if LWJGL provides other GUI libraries to check if this restriction applies to them. \(Many thanks to Timo Bühlmann for pointing out this issue\).
 
-## Platform Differences \(OSX\)
+## 플랫폼 차이 \(OSX\)
 
-You will be able to run the code described above on Windows or Linux, but we still need to do some modifications for OSX. As it's stated in th GLFW documentation:
+지금까지 나온 코드는 윈도우와 리눅스에서 작동시킬 수 있지만, OSX에서는 몇 줄을 더 추가해야 합니다. GLFW doc에서 이렇게 서술되어 있습니다.
 
 > The only OpenGL 3.x and 4.x contexts currently supported by OS X are forward-compatible, core profile contexts. The supported versions are 3.2 on 10.7 Lion and 3.3 and 4.1 on 10.9 Mavericks. In all cases, your GPU needs to support the specified OpenGL version for context creation to succeed.
 
-So, in order to support features explained in later chapters we need to add these lines to the `Window` class before the window is created:
+그러므로, 나중에 나올 기능들을 사용하기 위해서는 창을 생성하기 전에 `window` 클래스에 이 코드를 넣어야 합니다.
 
 ```java
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -319,5 +319,5 @@ So, in order to support features explained in later chapters we need to add thes
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 ```
 
-This will make the program use the highest OpenGL version possible between 3.2 and 4.1. If those lines are not included, a Legacy version of OpenGL is used.
+이 코드를 쓰면 프로그램이 3.2와 4.1 사이에서 가장 높은 오픈GL 버전을 사용하도록 할 수 있습니다. 이 코드가 없으면 옛날 버전의 오픈GL이 쓰일 겁니다.
 
