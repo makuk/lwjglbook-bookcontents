@@ -1,46 +1,45 @@
-# A brief about coordinates
+# 좌표에 대한 간략한 설명
 
-In this chapter we will talk a little bit about coordinates and coordinate systems trying to introduce some fundamental mathematical concepts in a simple way to support the techniques and topics that we will address in subsequent chapters. We will assume some simplifications which may sacrifice preciseness for the sake of legibility.
+이 장에서는 좌표와 좌표계에 대해서 다룹니다. 기초적인 수학 개념을 간단히 설명하여 이후 장들에 나올 개념들과 기법들의 이해를 돕게 하는 목적입니다. 이해가 쉽도록 몇몇 부분은 생략하였습니다.
 
-We locate objects in space by specifying its coordinates. Think about a map. You specify a point on a map by stating its latitude or longitude. With just a pair of numbers a point is precisely identified. That pair of numbers are the point coordinates (things are a little bit more complex in reality, since a map is a projection of a non perfect ellipsoid, the earth, so more data is needed but it’s a good analogy).
+우리는 좌표를 통해 물체의 위치를 표시합니다. 지도를 한 번 생각해 보세요. 위도와 경도를 사용하여 한 위치를 특정지을 수 있을 겁니다. 한 쌍의 숫자만 정확히 주어졌을 뿐인데 말이죠. 이 숫자쌍이 바로 점의 좌표가 됩니다. (현실에서는 조금 더 복잡하게 들어가야 합니다. 지도는 완벽한 구형이 아닌 지구를 평면에 나타낸 것이기 때문에 좀 더 많은 수치들이 필요하게 됩니다. 하지만 비유로써는 적절합니다).
 
-A coordinate system is a system which employs one or more numbers, that is, one or more coordinates to uniquely specify the position of a point. There are different coordinate systems (Cartesian, polar, etc.) and you can transform coordinates from one system to another. We will use the Cartesian coordinate system.
+좌표계에선 하나 혹은 여러 개의 숫자를 사용합니다. 한 점의 위치를 표기할 때 하나 혹은 여러 개의 숫자가 필요하다는 얘기죠. 좌표계에는 직교좌표계, 극좌표계 등의 다양한 좌표계가 있으며 한 좌표계에서 다른 좌표계로의 변환도 가능합니다. 여기서는 직교좌표계(데카르트 좌표계)를 사용할 겁니다.
 
-In the Cartesian coordinate system, for two dimensions, a coordinate is defined by two numbers that measure the signed distance to two perpendicular axes, x and y.
+2차원 직교좌표계에서는 두 개의 축(x축, y축)을 나타내는 두 숫자를 좌표로 씁니다.
 
 ![Cartesian Coordinate System](cartesian_coordinate_system.png) 
 
-Continuing with the map analogy, coordinate systems define an origin. For geographic coordinates the origin is set to the point where the equator and the zero meridian cross. Depending on where we set the origin, coordinates for a specific point are different. A coordinate system may also define the orientation of the axis. In the previous figure, the x coordinate increases as long as we move to the right and the y coordinate increases as we move upwards. But, we could also define an alternative Cartesian coordinate system with different axis orientation in which we would obtain different coordinates.
+먼저 원점을 정의합니다. 지도에 대한 비유를 다시 해보자면, 지도에서는 적도와 본초자오선이 만나는 점을 원점으로 정의합니다. 원점을 어디로 정하는가에 따라 다른 점들의 좌표도 달라지게 되죠. 좌표계에서는 축의 방향을 정하는 경우도 있습니다. 앞의 사진을 보면, x좌표는 오른쪽으로 갈수록 커지며 y좌표는 위로 갈수록 커지는 것을 알 수 있습니다. 하지만, 여기서 좌표축의 방향을 바꾼 새로운 좌표계를 정의하여 다른 좌표를 얻게 할 수도 있습니다.
  
 ![Alternative Cartesian Coordinate System](alt_cartesian_coordinate_system.png)
 
-As you can see we need to define some arbitrary parameters, such as the origin and the axis orientation in order to give the appropriate meaning to the pair of numbers that constitute a coordinate.  We will refer to that coordinate system with the set of arbitrary parameters as the coordinate space. In order to work with a set of coordinates we must use the same coordinate space. The good news is that we can transforms coordinates from one space to another just by performing translations and rotations.
+여기서 우리는 한 쌍의 숫자가 '좌표'라는 의미를 갖기 위해선 원점이나 좌표축의 방향 등 임의의 값들을 정해야 할 수도 있다는 것을 알 수 있습니다. 좌표계에 좌표공간이라는 개념을 추가해 보도록 하겠습니다. 좌표 여러 개를 다루기 위해서는 모두 한 좌표공간 안에 있어야 합니다. 다행힌 것은 좌표를 서로 다른 좌표공간으로 옮기기 위해선 그냥 이동과 회전만 하면 된다는 것입니다.
 
-If we are dealing with 3D coordinates we need an additional axis, the z axis. 3D coordinates will be formed by a set of three numbers (x, y, z). 
+만약 3차원 좌표를 사용해야 한다면, 새로운 축이 하나 더 필요하게 됩니다. 바로 z축이죠. 3차원 좌표는 (x, y, z)의 세 수로 이루어집니다.
  
 ![3D Cartesian Coordinate System](3d_cartesian_coordinate_system.png)
 
-As in 2D Cartesian coordinate spaces we can change the orientation of the axes in 3D coordinate spaces as long as the axes are perpendicular. The next figure shows another 3D coordinate space.
+좌표축들은 모두 서로 수직이기 때문에, 2차원에서처럼 3차원에서도 축의 방향을 바꿀 수 있습니다. 다음 사진은 또 다른 3차원 좌표계를 보여줍니다.
  
 ![Alternative 3D Cartesian Coordinate System](alt_3d_cartesian_coordinate_system.png)
 
-3D coordinates can be classified in two types: left handed and right handed. How do you know which type it is? Take your hand and form a “L” between your thumb and your index fingers, the middle finger should point in a direction perpendicular to the other two. The thumb should point to the direction where the x axis increases, the index finger should point where the y axis increases and the middle finger should point where the z axis increases. If you are able to do that with your left hand, then its left handed, if you need to use your right hand is right-handed.
+3차원 좌표계는 오른손 좌표와 왼손 좌표 두 개로 구분됩니다. 어느게 뭔지 어떻게 알 수 있냐고요? 손을 올려서 엄지와 검지손가락으로 ㄴ자를 만들어 보세요. 가운데손가락은 나머지 두 손가락과 수직을 이루게 놓으면 됩니다. 엄지손가락은 x좌표가 증가하는 방향, 검지손가락은 y좌표가 증가하는 방향, 가운데손가락은 z좌표가 증가하는 방향입니다. 왼손으로 한 방향이면 왼손 좌표가 되고, 오른손으로 한 방향이면 오른손 좌표가 되는 거죠.
 
 ![Right Handed vs Left Handed](righthanded_lefthanded.png) 
 
-2D coordinate spaces are all equivalent since by applying rotation we can transform from one to another. 3D coordinate spaces, on the contrary, are not all equal. You can only transform from one to another by applying rotation if they both have the same handedness, that is, if both are left handed or right handed.
+2차원 좌표는 어떻게 표현하던지 회전을 통해서 똑같게 만들 수 있습니다. 하지만 3차원 좌표는 그렇지 않습니다. 회전을 통하여 똑같게 만들 수 있는건 왼손 좌표끼리, 오른손 좌표끼리뿐입니다.
 
-Now that we have defined some basic topics let’s talk about some commonly used terms when dealing with 3D graphics. When we explain in later chapters how to render 3D models we will see that we use different 3D coordinate spaces, that is because each of those coordinate spaces has a context, a purpose. A set of coordinates is meaningless unless it refers to something. When you examine this coordinates (40.438031, -3.676626) they may say something to you or not. But if I say that they are geometric coordinates (latitude and longitude) you will see that they are the coordinates of a place in Madrid.
+이제 기초적인 설명은 끝났으니 3D 그래픽에서 사용되는 용어들을 정리해 보도록 합시다. 나중에 3D 모델 렌더링에 대해 설명할 때 서로 다른 3차원 좌표공간을 쓰는 것을 볼 수 있을 겁니다. 왜냐하면 각각의 좌표 공간별로 적절한 용도가 있기 때문이죠. 좌표는 무언가를 나타내지 않는 이상 쓸모 없는 숫자일 뿐입니다. (40.438031, -3.676626)라는 좌표를 봤을 때, 사람에 따라 그게 무언가를 의미할 수도 아닐 수도 있을 겁니다. 하지만 그 좌표가 지리적 좌표(위도, 경도)라는 정보가 주어졌다면, 마드리드에 있는 장소라는 것을 쉽게 알 수 있게 됩니다.
 
-When we will load 3D objects we will get a set of 3D coordinates. Those coordinates are expressed in a 3D coordinate space which is called object coordinate space. When the graphics designers are creating those 3D models they don’t know anything about the 3D scene that this model will be displayed in, so they can only define the coordinates using a coordinate space that is only relevant for the model.
+3D 오브젝트를 로드할 때 3차원 좌표에 대한 정보가 주어질 겁니다. 이 좌표는 '오브젝트 좌표공간'이라는 좌표공간에 있습니다. 그래픽 디자이너들이 3D 오브젝트를 만들 때 그들은 그 오브젝트가 어느 3D 장면에 놓이게 될 것인지 알지 못합니다. 그렇기 때문에 모델 전용의 좌표공간을 만들어서 좌표를 특정할 수밖에 없습니다.
 
-When we will be drawing a 3D scene all of our 3D objects will be relative to the so called world space coordinate space. We will need to transform from 3D object space to world space coordinates. Some objects will need to be rotated, stretched or enlarged and translated in order to be displayed properly in a 3D scene.
+3D 화면을 표현할 때 모든 3D 오브젝트들은 '전역 좌표공간'이라는 좌표공간에 있어야 합니다. 그러므로 3D 오브젝트 좌표공간에서 전역 좌표공간으로의 변환이 필요해집니다. 3D 화면에서 제대로 보이기 위해서는 오브젝트를 회전하거나, 늘리거나, 확대하거나, 이동시켜야 됩니다.
 
-We will also need to restrict the range of the 3D space that is shown, which is like moving a camera through our 3D space. Then we will need to transform world space coordinates to camera or view space coordinates. Finally these coordinates need to be transformed to screen coordinates, which are 2D, so we need to project 3D view coordinates to a 2D screen coordinate space.
+또한 화면에 보여지는 3D 공간의 범위를 지정해야 할 필요도 있을 겁니다. 카메라를 들고 3D 공간을 돌아다니는 것처럼 말이죠. 그러므로 전역 좌표공간에서 카메라 또는 시점 좌표공간으로 변환을 또 해야합니다. 마지막으로는 화면 좌표공간으로의 변환이 필요합니다. 화면은 2차원이기 때문에 3차원을 2차원에 투영시키는 변환을 해야하죠.
 
-The following picture shows OpenGL coordinates, (the z axis is perpendicular to the screen) and coordinates are between -1 and +1.
+다음 그림은 OpenGL 좌표에 대해 보여줍니다(z축은 화면과 수직입니다). 그리고 그 좌표는 -1과 1 사이입니다.
 
 ![OpenGL coordinates](opengl_coordinates.png) 
 
-Don’t worry if you don’t have a clear understanding of all these concepts. They will be revisited during next chapters with practical examples. 
-
+이 개념을 전부 이해하지 못했다고 해도 걱정하진 마세요. 다음 장들에서 좀 더 실용적인 예제들을 통하여 다시 설명할 거니까요.
