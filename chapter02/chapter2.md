@@ -1,4 +1,4 @@
-# The Game Loop
+# 게임 루프
 
 이번 장에서는 게임 루프를 만듦으로써 게임 엔진 개발을 본격적으로 시작해 보겠습니다. 게임 루프는 모든 게임에서의 핵심 요소입니다. 사용자 입력 처리, 게임 상태 업데이트, 화면 렌더링 같은 일을 끝없이 반복하죠.
 
@@ -76,27 +76,27 @@ private void sync(double loopStartTime) {
 }
 ```
 
-위 메소드는 어떤 일을 하는 걸까요? 요약하자면 게임 루프가 한 번 돌아가는 시간을 게산하고\(`loopSlot` 변수에 저장됨\) 그 시간까지 남은 만큼 기다려 줍니다. 하지만 그 남은 시간을 한번에 기다리는 대신 조금씩 기다립니다. 이렇게 하면 다른 작업들이 돌아갈 수 있게 되고, 앞서 말했던 정확도 문제도 해결할 수 있습니다. 그리고 그 다음에 해야 할 일들은 이렇습니다.
-1.    Calculate the time at which we should exit this wait method and start another iteration of our game loop \(which is the variable `endTime`\).  
-2.    Compare the current time with that end time and wait just one millisecond if we have not reached that time yet.
+위 메소드는 어떤 일을 하는 걸까요? 요약하자면 게임 루프가 한 번 돌아가는 시간을 계산하고\(`loopSlot` 변수에 저장됨\) 그 시간까지 남은 만큼 기다려 줍니다. 하지만 그 남은 시간을 한번에 기다리는 대신 조금씩 기다립니다. 이렇게 하면 다른 작업들이 돌아갈 수 있게 되고, 앞서 말했던 정확도 문제도 해결할 수 있습니다. 그리고 그 다음에 해야 할 일들은 이렇습니다.
+1.    wait 메소드를 끝내고 다음 루프로 넘어갈 시간을 계산한다\(`endTime` 변수에 저장됨\).
+2.    현재 시간과 끝 시간을 비교하고 아직 끝 시간에 도달하지 않았으면 1밀리초를 쉰다.
 
-Now it is time to structure our code base in order to start writing our first version of our Game Engine. But before doing that we will talk about another way of controlling the rendering rate. In the code presented above, we are doing micro-sleeps in order to control how much time we need to wait. But we can choose another approach in order to limit the frame rate. We can use v-sync \(vertical synchronization\). The main purpose of v-sync is to avoid screen tearing. What is screen tearing? It’s a visual effect that is produced when we update the video memory while it’s being rendered. The result will be that part of the image will represent the previous image and the other part will represent the updated one. If we enable v-sync we won’t send an image to the GPU while it is being rendered onto the screen.
+이제 게임 엔진을 만들기 위해 코드의 기반을 구성해야 합니다. 하지만 그 전에, 렌더링 주기를 조절하기 위한 다른 방법에 대해 이야기해 봅시다.위 코드에 나와있듯이 기다릴 시간을 조절하기 위해 조금씩 슬립을 했는데, 프레임 속도를 제한하기 위해 다른 방식으로도 접근해 볼 후 있습니다. 수직 동기화\(v-sync, vertical synchronization\)를 사용하는 것입니다. 수직 동기화의 주된 목적은 스크린 테어링\(screen tearing\)을 방지하는 것입니다. 스크린 테어링이란 렌더링하는 중에 영상 메모리가 업데이트 될 때 생기는 현상입니다. 일부는 이전 화면이, 일부는 다음 화면이 보여지게 되는 것이죠. 수직 동기화를 켜 놓으면 화면이 렌더링되는 동안에는 GPU에 다음 화면이 보내지지 않게 됩니다.
 
-When we enable v-sync we are synchronizing to the refresh rate of the video card, which at the end will result in a constant frame rate. This is done with the following line:
+수직 동기화를 켜면 비디오 카드의 주사율이 동기화되고, 일정하게 프레임 속도를 유지시킬 수 있게 됩니다. 코드를 이렇게 짜면 됩니다.
 
 ```java
 glfwSwapInterval(1);
 ```
 
-With that line we are specifying that we must wait, at least, one screen update before drawing to the screen. In fact, we are not directly drawing to the screen. We instead store the information to a buffer and we swap it with this method:
+이렇게 씀으로써 최소 화면 업데이트를 하나는 기다려야 화면을 그릴 수 있도록 정할 수 있습니다. 사실 화면을 직접적으로 그리는 건 아닙니다. 대신 정보를 버퍼에 저장하고 그걸 이 메소드를 호출하여 전환합니다.
 
 ```java
 glfwSwapBuffers(windowHandle);
 ```
 
-So, if we enable v-sync we achieve a constant frame rate without performing the micro-sleeps to check the available time. Besides that, the frame rate will match the refresh rate of our graphics card. That is, if it’s set to 60Hz \(60 times per second\), we will have 60 Frames Per Second. We can scale down that rate by setting a number higher than 1 in the `glfwSwapInterval` method \(if we set it to 2, we would get 30 FPS\).
+그러므로 수직 동기화를 사용하면 시간을 확인하기 위해 조금씩 슬립할 필요가 없습니다. 게다가 프레임 속도가 그래픽 카드의 주사율과 동일해질 것입니다. 그렇다는 건, 만약 그래픽 카드가 60Hz\(초당 60번\)으로 정해져 있다면 60FPS가 될 것입니다. `glfwSwapInterval` 메소드의 파라미터 숫자를 1보다 높게 잡으면 속도를 늦출 수 있습니다\(2로 하면 30FPS가 되겠죠\).
 
-Let’s get back to reorganize the source code. First of all we will encapsulate all the GLFW Window initialization code in a class named `Window` allowing some basic parameterization of its characteristics \(such as title and size\). That `Window` class will also provide a method to detect key presses which will be used in our game loop:
+그럼 다시 돌아가서 코드를 재구성해 봅시다. 파라미터로 기본 설정\(이름과 크기같은 것들\)을 받는 `Window` 클래스를 만들고 모든 GLFW 창 초기화 코드를 그 안에 캡슐화시킬 겁니다. 이 `Window` 클래스에는 게임 루프에 쓰일 키 입력 감지 메소드도 들어갑니다.
 
 ```java
 public boolean isKeyPressed(int keyCode) {
@@ -104,7 +104,7 @@ public boolean isKeyPressed(int keyCode) {
 }
 ```
 
-The `Window` class besides providing the initialization code also needs to be aware of resizing. So it needs to setup a callback that will be invoked whenever the window is resized. The callback will receive the width and height, in pixels, of the framebuffer \(the rendering area, in this sample, the display area\). If you want the width, height of the framebuffer in screen coordinates you may use the the  `glfwSetWindowSizeCallback`method. Screen coordinates don't necessarilly correspond to pixels \(for instance, on a Mac with Retina display. Since we are going to use that information when performing some OpenGL calls, we are interested in pixels not in screen coordinates. You can get more infomation in the GLFW documentation.
+이 `Window` 클래스는 창을 초기화하는 일을 하는 동시에 창 크기가 재조정되는지도 알아야 합니다. 그러므로 창 크기가 재조정될 때 호출될 메소드를 만들어야겠죠. 그 메소드는 프레임 버퍼\(렌더링되는 영역, 이 예제에서는 화면 영역\)의 너비와 높이의 픽셀 값을 받게 될 겁니다. 화면 좌표로 프레임 버퍼의 너비와 높이를 받고 싶다면 `glfwSetWindowSizeCallback` 메소드를 사용해도 됩니다. 화면 좌표는 꼭 픽셀과 대응되는 것은 아닙니다\(레티나 디스플레이를 사용하는 맥이 이에 해당합니다\). 너비와 높이 정보는 오픈GL을 사용하는 데에 쓸 것이므로 화면상의 좌표가 아니라 픽셀 값이 필요합니다. GLFW doc에서 자세한 정보를 알아볼 수 있습니다.
 
 ```java
 // Setup resize callback
@@ -115,7 +115,7 @@ glfwSetFramebufferSizeCallback(windowHandle, (window, width, height) -> {
 });
 ```
 
-We will also create a `Renderer` class which will handle our game render logic. By now, it will just have an empty `init` method and another method to clear the screen with the configured clear color:
+게임 렌더링 로직을 관리하기 위한 `Renderer` 클래스도 만들고 그 안에는 비어있는 `init` 메소드와 설정된 색으로 화면을 지울 메소드를 만들겠습니다.
 
 ```java
 public void init() throws Exception {
@@ -126,7 +126,7 @@ public void clear() {
 }
 ```
 
-Then we will create an interface named `IGameLogic` which will encapsulate our game logic. By doing this we will make our game engine reusable across different titles. This interface will have methods to get the input, to update the game state and to render game-specific data.
+그리고 게임 로직을 캡슐화할 `IGameLogic` 인터페이스도 만들겠습니다. 이걸 만듦으로써 이 게임 엔진을 다른 게임에도 재사용할 수 있게 될 것입니다. 이 인터페이스에는는 입력을 얻어오는 메소드, 게임 상태를 업데이트하는 메소드, 게임의 특정 데이터를 렌더링하는 메소드를 넣을 겁니다.
 
 ```java
 public interface IGameLogic {
@@ -141,7 +141,7 @@ public interface IGameLogic {
 }
 ```
 
-Then we will create a class named `GameEngine` which will contain our game loop code. This class will implement the `Runnable` interface since the game loop will be run inside a separate thread:
+그리고 게임 루프 코드를 넣을 `GameEngine` 클래스도 만들겠습니다. 이 클래스는 다른 스레드에서 돌아가게 하기 위해 `Runnable` 인터페이스를 구현하도록 하겠습니다.
 
 ```java
 public class GameEngine implements Runnable {
@@ -158,7 +158,7 @@ public class GameEngine implements Runnable {
     }
 ```
 
-The `vSync` parameter allows us to select if we want to use v-sync or not. You can see we create a new Thread which will execute the run method of our `GameEngine` class which will contain our game loop:
+`vSync` 파라미터로는 수직 동기화 사용 여부를 결정할 수 있습니다. 이제 게임 루프가 들어 있는 `GameEngine` 클래스의 run 메소드를 실행할 스레드를 새로 하나 만들어봅시다. 
 
 ```java
 public void start() {
@@ -176,11 +176,11 @@ public void run() {
 }
 ```
 
-Our `GameEngine` class provides a start method which just starts our Thread so the run method will be executed asynchronously. That method will perform the initialization tasks and will run the game loop until our window is closed. It is very important to initialize GLFW inside the thread that is going to update it later. Thus, in that `init` method our Window and `Renderer` instances are initialized.
+`GameEngine` 클래스의 스레드를 시작하는 start 메소드가 비동기적으로 run 메소드를 실행시키게 됩니다. 이 메소드는 초기화하는 일과 창이 닫힐 때까지 게임 루프를 돌리는 일을 할 겁니다. 나중에 업데이트될 GLFW를 같은 스레드에서 초기화하는 것이 매우 중요합니다. 그러므로 `init` 메소드에는 Window와 `Renderer` 인스턴스를 초기화하는 코드를 넣겠습니다.
 
-In the source code you will see that we created other auxiliary classes such as Timer \(which will provide utility methods for calculating elapsed time\) and will be used by our game loop logic.
+이 코드에서는 Timer\(경과된 타임을 계산하는 유틸리티 메소드가 있는 클래스\)같은 보조 클래스들이 몇 개 들어가 있고, 게임 루프 로직에 사용될 것입니다.
 
-Our `GameEngine` class just delegates the input and update methods to the `IGameLogic` instance. In the render method it delegates also to the `IGameLogic`  instance and updates the window.
+`GameEngine` 클래스에 있는 input과 update 메소드를 `IGameLogic` 인스턴스에 넘겨줍니다. render 메소드도 IGameLogic 인스턴스에 넘겨준 뒤 창을 업데이트합니다.
 
 ```java
 protected void input() {
@@ -197,7 +197,7 @@ protected void render() {
 }
 ```
 
-Our starting point, our class that contains the main method will just only create a `GameEngine` instance and start it.
+프로그램의 시작점이 되는 main 메소드를 포함하는 클래스는 `GameEngine` 인스턴스를 만들고 시작시킵니다.
 
 ```java
 public class Main {
@@ -218,7 +218,7 @@ public class Main {
 }
 ```
 
-At the end we only need to create or game logic class, which for this chapter will be a simpler one. It will just increase / decrease the clear color of the window whenever the user presses the up / down key. The render method will just clear the window with that color.
+마지막으로 게임 로직 클래스를 만들면 됩니다. 이번 장에서는 간단하게 만들겠습니다. 사용자가 위/아래 화살표를 누름에 따라 창의 초기화 색을 증가/감소시킵니다. render 메소드는 창을 그 색으로 초기화하는 일만 합니다.
 
 ```java
 public class DummyGame implements IGameLogic {
@@ -271,21 +271,21 @@ public class DummyGame implements IGameLogic {
 }
 ```
 
-In the `render` method we get notified when the window has been resized in order to update the viewport to locate the center of the coordinates to the center of the window.
+`render` 메소드에서는 창 크기가 변했는지 확인하고 뷰포트 위치를 창의 중앙으로 바꿉니다.
 
-The class hierarchy that we have created will help us to separate our game engine code from the code of a specific game. Although it may seem unnecessary at this moment, we need to isolate generic tasks that every game will use from the state logic, artwork and resources of a specific game in order to reuse our game engine. In later chapters we will need to restructure this class hierarchy as our game engine gets more complex.
+방금 짠 클래스 체계는 게임 엔진 코드와 게임 코드를 분리시키는 데에 도움이 될 겁니다. 지금으로서는 필요 없어 보이지만, 게임 엔진을 재사용하기 위해서는 모든 게임이 사용하는 상태 로직같은 일반적인 기능들과 특정 게임에서 사용하는 텍스쳐나 리소스 등을 분리해야 합니다. 게임 엔진 코드가 점점 더 복잡해지게 되므로 후에 클래스 체계를 재구성할 겁니다.
 
-## Threading issues
+## 스레드 문제
 
-If you try to run the source code provided above in OSX you will get an error like this:
+OSX에서 지금까지 나온 코드를 실행하면 아래같은 에러가 날 겁니다.
 
 ```
 Exception in thread "GAME_LOOP_THREAD" java.lang.ExceptionInInitializerError
 ```
 
-What does this mean? The answer is that some functions of the GLFW library cannot be called in a `Thread` which is not the main `Thread`. We are doing the initializing stuff, including window creation in the `init` method of the  `GameEngine class`. That method gets called in the `run` method of the same class, which is invoked by a new `Thread` instead of the one that's used to launch the program.
+이게 무슨 말일까요? GLFW 라이브러리의 일부 기능은 메인 `스레드` 이외의 `스레드`에서 실행될 수 없습니다. 지금 여기에서는 `GameEngine 클래스`의 `init` 메소드에서 창 생성을 포함한 초기화 작업을 하고 있습니다. 그 메소드는 같은 클래스의 `run` 메소드에서 실행되고, 그 `run` 메소드는 프로그램이 실행될 때의 `스레드`가 아닌 새 `스레드`에서 호출됩니다.
 
-This is a constraint of the GLFW library and basically it implies that we should avoid the creation of new Threads for the game loop. We could try to create all the Windows related stuff in the main thread but we will not be able to render anything. The problem is that, OpenGL calls need to be performed in the same `Thread` that its context was created.
+이건 GLFW 라이브러리에서의 필수사항이고 게임 루프용의 새 스레드를 생성하지 말아야 한다는 것을 암시합니다. 그럼 창 관련된 것들은 메인 스레드에서 실행시켜야 하는데, 그럼 렌더링이 되지 않을 겁니다. 오픈GL은 그 context가 생성된 것과 같은 `스레드`에서 실행되어야 하기 때문입니다.
 
 윈도우와 리눅스에서는 메인 스레드에서 GLFW를 초기화하지 않아도 예제 코드가 작동되겠지만, OSX에서는 아닙니다. 그래서 OSX에서도 작동이 되게 하기 위해서는 `GameEngine` 클래스에 있는 `run` 메소드의 코드를 약간 수정해야 합니다.
 
