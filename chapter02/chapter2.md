@@ -302,14 +302,13 @@ public void start() {
 
 위 코드는 OSX일 경우에 게임 루프 스레드를 만들지 않고 메인 스레드에서 게임 루프 코드를 실행시킵니다. 이건 완벽한 해결책은 아니지만 맥에서 예제 코드를 작동시킬 수는 있습니다. 포럼에 나오는 다른 해결책\(JVM을 `-XstartOnFirstThread` 플래그를 넣어서 실행시키는 것\)은 잘 먹히지 않는 것으로 보입니다.
 
-In the future it may be interesting to explore if LWJGL provides other GUI libraries to check if this restriction applies to them. \(Many thanks to Timo Bühlmann for pointing out this issue\).
+나중에는 LWJGL이 다른 GUI 라이브러리에게 이러한 제한 사항을 적용하는지를 보기 위해 그런 라이브러리를 제공하는지 알아보는 것도 재미있을 겁니다.  \(Timo Bühlmann님께 이 점을 지적해주신 것에 대해 큰 감사를 표합니다.\).
 
 ## 플랫폼 차이 \(OSX\)
 
 지금까지 나온 코드는 윈도우와 리눅스에서 작동시킬 수 있지만, OSX에서는 몇 줄을 더 추가해야 합니다. GLFW doc에서 이렇게 서술되어 있습니다.
 
-> The only OpenGL 3.x and 4.x contexts currently supported by OS X are forward-compatible, core profile contexts. The supported versions are 3.2 on 10.7 Lion and 3.3 and 4.1 on 10.9 Mavericks. In all cases, your GPU needs to support the specified OpenGL version for context creation to succeed.
-
+> OS X에서 유일하게 지원하는 오픈GL 3.x와 4.x의 context는 상위 호환되는 핵심 프로필 context입니다. 10.7 Lion은 3.2를, 10.9 Mavericks에서는 3.3과 4.1을 지원합니다. GPU는 context 생성을 성공적으로 하기 위해 지정된 오픈GL 버전을 모든 경우에 지원해야 합니다.
 그러므로, 나중에 나올 기능들을 사용하기 위해서는 창을 생성하기 전에 `window` 클래스에 이 코드를 넣어야 합니다.
 
 ```java
@@ -319,5 +318,5 @@ In the future it may be interesting to explore if LWJGL provides other GUI libra
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 ```
 
-이 코드를 쓰면 프로그램이 3.2와 4.1 사이에서 가장 높은 오픈GL 버전을 사용하도록 할 수 있습니다. 이 코드가 없으면 옛날 버전의 오픈GL이 쓰일 겁니다.
+이 코드를 쓰면 프로그램이 3.2와 4.1 사이에서 지원되는 가장 높은 오픈GL 버전을 사용하도록 할 수 있습니다. 이 코드가 없으면 옛날 버전의 오픈GL이 쓰일 겁니다.
 
