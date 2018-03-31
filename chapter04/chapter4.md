@@ -1,31 +1,31 @@
-# Rendering
+# 렌더링
 
-In this chapter we will learn the processes that takes place while rendering a scene using OpenGL. If you are used to older versions of OpenGL, that is fixed-function pipeline, you may end this chapter wondering why it needs to be so complex. You may end up thinking that drawing a simple shape to the screen should not require so many concepts and lines of code. Let me give you an advice for those of you that think that way. It is actually simpler and much more flexible. You only need to give it a chance. Modern OpenGL lets you think in one problem at a time and it lets you organize your code and processes in a more logical way.
+이 장에서는 OpenGL을 활용하여 화면을 렌더링하는 방법에 대해 배웁니다. 고정기능 파이프라인을 사용하는 OpenGL의 과거 버전에 익숙하시다면, 이 장이 끝날 즈음엔 왜 이렇게 복잡하게 만들어야 하는지에 대해 의문이 생길지도 모릅니다. 왜 간단한 도형 하나를 그리는데 이렇게나 많은 개념들과 긴 코드를 써야 하는지 이해가 되지 않을겁니다. 그러나 한 번 써보면 오히려 이게 더 간단하고 유연한 코드라는 걸 알 수 있을 겁니다. 최신 버전의 OpenGL에서는 문제 각각에 대해 따로따로 생각할 수 있으며 코드를 보기 쉽게 정리하고 더 논리적으로 처리할 수 있습니다.
 
-The sequence of steps that ends up drawing a 3D representation into your 2D screen is called the graphics pipeline. First versions of OpenGL employed a model which was called fixed-function pipeline. This model employed a set of steps in the rendering process which defined a fixed set of operations. The programmer was constrained to the set of functions available for each step. Thus, the effects and operations that could be applied were limited by the API itself \(for instance, “set fog” or “add light”, but the implementation of those functions were fixed and could not be changed\).
+3D로 구현된 것을 2D 화면에 출력하기까지의 일련의 과정을 그래픽 파이프라인이라 부릅니다. OpenGL의 초기 버전에서는 고정기능 파이프라인이란 모형을 사용하였습니다. 그 모형에서는 렌더링 과정에서 고정된 단계의 작업을 진행하였습니다. 프로그래머들은 각 단계별로 사용 가능한 함수들을 정해야만 하였습니다. 이 때문에 결과물과 작업은 API에 의해 한정될 수밖에 없었습니다. \(예를 들면, “안개 설정” 또는 “광원 추가”가 있습니다. 그 함수들의 동작은 고정되어 있어 수정이 불가능합니다\).
 
-The graphics pipeline was composed of these steps:
+그래픽 파이프라인은 이러한 단계로 구성됩니다:
 
 ![Graphics Pipeline](rendering_pipeline.png)
 
-OpenGL 2.0 introduced the concept of programmable pipeline. In this model, the different steps that compose the graphics pipeline can be controlled or programmed by using a set of specific programs called shaders. The following picture depicts a simplified version of the OpenGL programmable pipeline:
+OpenGL 2.0버전은 프로그래밍 가능한 파이프라인을 선보입니다. 이 모형에서는 그래픽 파이프라인을 구성하는 각 단계들을 '셰이더'라 불리는 프로그램을 사용하여 수정이 가능합니다. 다음 그림은 OpenGL의 프로그래밍 가능한 파이프라인을 간략하게 보여주고 있습니다.
 
 ![Programmable pipeline](rendering_pipeline_2.png)
 
-The rendering starts taking as its input a list of vertices in the form of Vertex Buffers. But, what is a vertex? A vertex is a data structure that describes a point in 2D or 3D space. And how do you describe a point in a 3D space? By specifying its x, y and z coordinates. And what is a Vertex Buffer? A Vertex Buffer is another data structure that packs all the vertices that need to be rendered, by using vertex arrays, and makes that information available to the shaders in the graphics pipeline.
+렌더링은 정점 버퍼의 형태로 정점들의 리스트를 받아 오는 것에서 시작합니다. 근데, 정점이 뭘까요? 정점은 2차원 또는 3차원 내의 한 점을 나타내는 자료구조입니다. 3차원 공간에서 점을 나타내려면 x, y, z좌표를 특정하면 되겠죠? 그렇다면 정점 버퍼란 무엇일까요? 정점 버퍼는 정점 배열을 사용하여 렌더링해야할 모든 정점들을 묶는 자료구조입니다. 그래픽 파이프라인 내에서 셰이더를 통해 정점들의 정보를 얻을 수 있게 해주죠.
 
-Those vertices are processed by the vertex shader whose main purpose is to calculate the projected position of each vertex into the screen space. This shader can generate also other outputs related to colour or texture, but its main goal is to project the vertices into the screen space, that is, to generate dots.
+정점들은 정점 셰이더를 통해 처리됩니다. 정점 셰이더의 주 목적은 화면에서 각 정점의 투영된 위치를 계산하는 겁니다. 이 셰이더로 색이나 질감 등에 관련된 다른 출력도 가능하지만, 일반적으론 화면에 정점들을 투영시키는 데 사용되죠. 다른 말로 하면, 점을 찍는다는 겁니다.
 
-The geometry processing stage connects the vertices that are transformed by the vertex shader to form triangles. It does so by taking into consideration the order in which the vertices were stored and grouping them using different models. Why triangles? A triangle is like the basic work unit for graphic cards. It’s a simple geometric shape that can be combined and transformed to construct complex 3D scenes. This stage can also use a specific shader to group the vertices.
+기하 도형 처리 과정에서는 정점 셰이더를 통해 변형된 정점들을 삼각형의 형태로 만듭니다. 이 과정에서는 정점들이 저장되어 있는 순서를 고려하여 그들을 서로 다른 모델을 사용하여 묶는 방식을 사용합니다. 왜 하필 삼각형일까요? 삼각형은 그래픽 카드가 처리하는 가장 기본적인 단위 비슷한 겁니다. 삼각형은 간단한 도형임에도 서로 합치고 변형하면 복잡한 3차원 화면을 표현할 수 있습니다. 이 단계에서도 정점들을 묶기 위해 셰이더를 사용할 수 있습니다.
 
-The rasterization stage takes the triangles generated in the previous stages, clips them and transforms them into pixel-sized fragments.
+래스터화 단계에서는 전 단계에서 만들었던 삼각형들을 잘라내고 변형해서 픽셀 사이즈의 프래그먼트로 만듭니다.
 
-Those fragments are used during the fragment processing stage by the fragment shader to generate pixels assigning them the final color that gets written into the framebuffer. The framebuffer is the final result of the graphics pipeline. It holds the value of each pixel that should be drawn to the screen.
+이 프래그먼트들은 프래그먼트 처리 단계에서  프래그먼트 셰이더를 통해 사용됩니다. 프래그먼트 셰이더는 픽셀을 생성하고 프레임버퍼에 쓰여질 색을 최종적으로 할당합니다. 프레임버퍼는 그래픽 파이프라인의 최종단계입니다. 화면에 표현될 각 픽셀의 정보를 담고 있죠.
 
-Keep in mind that 3D cards are designed to parallelize all the operations described above. The input data can be processes in parallel in order to generate the final scene.
+3D 카드는 위에서 설명한 모든 작업을 병렬적으로 처리할 수 있게 설계되어 있다는 걸 알아두세요. 최종 화면을 보여주기 위해서 입력된 정보는 병렬적으로 처리될 수 있습니다.
 
-So let's start writing our first shader program. Shaders are written by using the GLSL language \(OpenGL Shading Language\) which is based on ANSI C. First we will create a file named “`vertex.vs`” \(The extension is for Vertex Shader\) under the resources directory with the following content:
-
+그렇다면 첫 셰이더 프로그램을 작성해 보도록 합시다. 셰이더는 ANSI C 기반의 GLSL \(OpenGL Shading Language\)을 사용하여 제작되어 있습니다.
+일단 resources 폴더에 “`vertex.vs`” \(정점(vertex) 셰이더용\)라는 파일을 만들어 다음 내용을 적어줍시다.
 ```
 #version 330
 
